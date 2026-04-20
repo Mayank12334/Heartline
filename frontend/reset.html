@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password | Hearthline</title>
+  <link rel="icon" type="image/svg+xml" href="hearthline-favicon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#120f25">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="reset.page.css">
+</head>
+<body class="auth-page">
+  <div class="live-grid"></div>
+  <div class="live-orb one"></div>
+  <div class="live-orb two"></div>
+  <div class="live-orb three"></div>
+  <div class="live-image ring"></div>
+  <div class="live-image wave"></div>
+  <div class="live-image spark"></div>
+  <div class="page-shell">
+    <section class="intro">
+      <h1>Set a new password and get back to writing.</h1>
+      <p>Choose a fresh password to restore access to your account and return to your publishing workflow without delay.</p>
+      <div class="points">
+        <div class="point">A reset experience aligned with the rest of the product</div>
+        <div class="point">Helpful guidance for missing or expired links</div>
+        <div class="point">Automatic return to sign in after success</div>
+      </div>
+    </section>
+
+    <div class="overlay-card">
+      <div class="modal">
+        <h2>Create a new password</h2>
+        <p class="subtitle">Choose a strong new password to secure your account and continue where you left off.</p>
+
+        <form onsubmit="handlePasswordReset(event)" autocomplete="off">
+          <input id="password" type="password" placeholder="New password" autocomplete="new-password">
+          <button type="submit">Reset Password</button>
+        </form>
+
+        <div class="links">
+          <a href="login.html">Return to sign in</a>
+          <a href="index.html">Return home</a>
+        </div>
+
+        <p class="msg" id="msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="pwa-register.js"></script>
+  <script src="reset.page.js"></script>
+</body>
+</html>
+

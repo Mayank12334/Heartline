@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Hearthline</title>
+  <link rel="icon" type="image/svg+xml" href="hearthline-favicon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#120f25">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="signup.page.css">
+</head>
+<body class="auth-page signup-auth">
+  <div class="live-grid"></div>
+  <div class="live-orb one"></div>
+  <div class="live-orb two"></div>
+  <div class="live-orb three"></div>
+  <div class="live-image ring"></div>
+  <div class="live-image wave"></div>
+  <div class="live-image spark"></div>
+  <main class="register-layout">
+    <section class="register-form-panel">
+      <div class="panel-surface">
+        <div class="panel-decor decor-top"></div>
+        <div class="panel-decor decor-bottom"></div>
+        <div class="panel-grid-glow"></div>
+        <p class="eyebrow">Create your profile</p>
+        <h1>Register your Hearthline account</h1>
+        <p class="subtitle">This uses your current registration data model: name, email, password, avatar selection, and public or private account type.</p>
+
+        <form class="signup-form" onsubmit="handleSignup(event)" autocomplete="off" novalidate>
+          <div class="form-grid">
+            <label class="field">
+              <span>Full name</span>
+              <input id="name" placeholder="Enter your full name" autocomplete="off">
+            </label>
+
+            <label class="field">
+              <span>Email</span>
+              <input id="email" type="text" placeholder="Enter your email" autocomplete="off">
+            </label>
+
+            <label class="field field-wide">
+              <span>Password</span>
+              <div class="password-wrap">
+                <input id="password" type="password" placeholder="Create a strong password" autocomplete="new-password">
+                <button class="password-toggle" id="passwordToggle" type="button" onclick="togglePasswordVisibility('password', 'passwordToggle')">Show</button>
+              </div>
+            </label>
+
+            <div class="password-guide field-wide" id="passwordGuide">
+              <div class="password-rule" data-rule="uppercase">Use at least one uppercase letter</div>
+              <div class="password-rule" data-rule="lowercase">Use at least one lowercase letter</div>
+              <div class="password-rule" data-rule="number">Use at least one numeric value</div>
+              <div class="password-rule" data-rule="special">Use at least one special character</div>
+            </div>
+
+            <div class="avatar-panel field-wide">
+              <div class="section-head">
+                <div>
+                  <div class="section-label">Choose your avatar</div>
+                  <p>Pick the profile style that fits your account.</p>
+                </div>
+                <div class="selected-avatar-preview" id="selectedAvatarPreview" aria-hidden="true"></div>
+              </div>
+              <div class="avatar-picker" id="avatarPicker"></div>
+            </div>
+
+            <div class="visibility-group field-wide">
+              <div class="section-head compact">
+                <div>
+                  <div class="section-label">Choose your account type</div>
+                  <p>Decide how visible your posts should be on the platform.</p>
+                </div>
+              </div>
+              <div class="visibility-options">
+                <label class="visibility-option" for="accountTypePublic">
+                  <input id="accountTypePublic" type="radio" name="accountType" value="public" checked>
+                  <div>
+                    <strong>Public account</strong>
+                    <span>Your blogs can be seen by everyone visiting the platform.</span>
+                  </div>
+                </label>
+                <label class="visibility-option" for="accountTypePrivate">
+                  <input id="accountTypePrivate" type="radio" name="accountType" value="private">
+                  <div>
+                    <strong>Private account</strong>
+                    <span>Your blogs are only visible to people who follow you.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <div class="field-error" id="signupValidation"></div>
+            <button class="primary-action" type="submit" id="signupButton">Create Account</button>
+          </div>
+        </form>
+
+        <div class="auth-footer">
+          <a href="login.html">Already have an account?</a>
+          <a href="index.html">Return home</a>
+        </div>
+
+        <div class="register-benefits">
+          <div class="benefit-card">
+            <strong>Choose an identity</strong>
+            <span>Select an avatar and start with a profile that feels personal.</span>
+          </div>
+          <div class="benefit-card">
+            <strong>Control visibility</strong>
+            <span>Use public or private mode based on how you want your posts to be seen.</span>
+          </div>
+          <div class="benefit-card">
+            <strong>Start immediately</strong>
+            <span>Once registered, the same credentials work directly on your login page.</span>
+          </div>
+        </div>
+
+        <p class="msg" id="msg"></p>
+      </div>
+    </section>
+
+    <aside class="register-showcase">
+      <div class="showcase-card mountain-card">
+        <div class="hero-visual" aria-hidden="true">
+          <div class="sky-cycle"></div>
+          <div class="sky-haze"></div>
+          <div class="cloud cloud-large"></div>
+          <div class="cloud cloud-mid"></div>
+          <div class="cloud cloud-small"></div>
+          <div class="sun-track">
+            <div class="sun-disc"></div>
+          </div>
+          <div class="hover-orb orb-one"></div>
+          <div class="hover-orb orb-two"></div>
+          <div class="hover-line line-one"></div>
+          <div class="hover-line line-two"></div>
+          <div class="mountain mountain-back"></div>
+          <div class="mountain mountain-mid"></div>
+          <div class="mountain mountain-front"></div>
+          <div class="land-base"></div>
+          <div class="meadow meadow-one"></div>
+          <div class="meadow meadow-two"></div>
+          <div class="meadow meadow-three"></div>
+          <div class="river-flow river-back"></div>
+          <div class="river-flow river-front"></div>
+          <div class="river-reflection reflection-one"></div>
+          <div class="river-reflection reflection-two"></div>
+          <div class="grass grass-a" aria-hidden="true"></div>
+          <div class="grass grass-b" aria-hidden="true"></div>
+          <div class="grass grass-c" aria-hidden="true"></div>
+          <div class="grass grass-d" aria-hidden="true"></div>
+          <div class="grass grass-e" aria-hidden="true"></div>
+          <div class="grass grass-f" aria-hidden="true"></div>
+          <div class="stone stone-a" aria-hidden="true"></div>
+          <div class="stone stone-b" aria-hidden="true"></div>
+          <div class="stone stone-c" aria-hidden="true"></div>
+          <div class="stone stone-d" aria-hidden="true"></div>
+          <div class="stone stone-e" aria-hidden="true"></div>
+          <div class="fish fish-one" aria-hidden="true"></div>
+          <div class="fish fish-two" aria-hidden="true"></div>
+          <div class="fish fish-three" aria-hidden="true"></div>
+          <div class="fish fish-four" aria-hidden="true"></div>
+          <div class="fish fish-five" aria-hidden="true"></div>
+          <div class="lake lake-top"></div>
+          <div class="lake lake-bottom"></div>
+        </div>
+      </div>
+
+      <div class="showcase-grid">
+        <div class="showcase-card soft-card">
+          <div class="cloud-image"></div>
+        </div>
+        <div class="showcase-card lime-card">
+          <p class="eyebrow">Built for your data</p>
+          <h2>Profile setup with real app fields</h2>
+          <p>New users still register into your current backend and can sign in with the same credential flow right after signup.</p>
+        </div>
+      </div>
+
+      <div class="showcase-card feature-row">
+        <div class="feature-chip">
+          <strong>Avatar picker</strong>
+          <span>Interactive selection</span>
+        </div>
+        <div class="feature-chip">
+          <strong>Password guide</strong>
+          <span>Live rule checking</span>
+        </div>
+        <div class="feature-chip">
+          <strong>Account type</strong>
+          <span>Public or private</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="pwa-register.js"></script>
+  <script src="signup.page.js"></script>
+</body>
+</html>
+

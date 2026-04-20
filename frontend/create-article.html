@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Article | Hearthline</title>
+  <link rel="icon" type="image/svg+xml" href="hearthline-favicon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#120f25">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="create-article.page.css">
+</head>
+<body class="auth-page">
+  <div class="live-grid"></div>
+  <div class="live-orb one"></div>
+  <div class="live-orb two"></div>
+  <div class="live-orb three"></div>
+  <div class="live-image ring"></div>
+  <div class="live-image wave"></div>
+  <div class="live-image spark"></div>
+  <div class="page-shell">
+    <section class="intro">
+      <h1>Write, shape, and save stories at your own pace.</h1>
+      <p>This dedicated writing page now supports both polished publishing and flexible draft saving, so your ideas can stay private until they are ready.</p>
+      <div class="points">
+        <div class="point">Save unfinished work as drafts without losing your momentum</div>
+        <div class="point">Live article stats so you can feel the size and rhythm of each story</div>
+        <div class="point">Publish when ready or return later to keep refining the piece</div>
+      </div>
+    </section>
+
+    <div class="overlay-card">
+      <div class="modal">
+        <h2 id="editorHeading">Create a new article</h2>
+        <p class="subtitle" id="editorSubtitle">Shape the headline, write the body, and decide whether to publish now or save it as a draft.</p>
+
+        <form onsubmit="handlePublish(event)" novalidate>
+          <div class="editor-grid">
+            <input id="title" type="text" placeholder="Enter article title">
+            <textarea id="content" placeholder="Start writing your story..."></textarea>
+            <div class="stat" id="statusCard">
+              Status
+              <strong id="storyStatus">Drafting</strong>
+            </div>
+            <div class="quick-stats">
+              <div class="stat">
+                Title
+                <strong id="titleCount">0 chars</strong>
+              </div>
+              <div class="stat">
+                Story Size
+                <strong id="wordCount">0 words</strong>
+              </div>
+              <div class="stat">
+                Reading Time
+                <strong id="readTime">0 min</strong>
+              </div>
+            </div>
+            <div class="field-error" id="editorValidation"></div>
+          </div>
+
+          <div class="actions">
+            <div class="actions-left">
+              <button class="secondary" type="button" onclick="window.location.href='index.html'">Back to Home</button>
+              <button class="secondary" type="button" onclick="saveDraft()">Save Draft</button>
+            </div>
+            <button type="submit" id="publishButton">Publish Post</button>
+          </div>
+        </form>
+
+        <div class="links">
+          <a href="index.html">Return to dashboard</a>
+          <a href="login.html">Switch account</a>
+        </div>
+
+        <p class="msg" id="msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="pwa-register.js"></script>
+  <script src="create-article.page.js"></script>
+</body>
+</html>
+
