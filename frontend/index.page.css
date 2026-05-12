@@ -464,6 +464,14 @@
         font-size: 0.84rem;
       }
     }
+    @media (max-width: 1180px) {
+      .side-actions {
+        top: auto;
+        right: 18px;
+        bottom: 18px;
+        transform: none;
+      }
+    }
     @keyframes sideIconFloat {
       0%, 100% {
         transform: translateY(0) scale(1);
@@ -2166,9 +2174,8 @@
     .post-body {
         padding: 24px 22px 20px 26px;
       }
-      .post-footer {
-        align-items: flex-start;
-      }
+    .post-footer {
+      align-items: flex-start;
     }
 
 
@@ -2285,5 +2292,133 @@
   body.is-authenticated .post {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-shell,
+  .container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .container {
+    margin: 0;
+    padding: 22px 14px 108px;
+  }
+
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .brand,
+  .brand h1,
+  .brand p {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .brand h1 {
+    font-size: 2rem;
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+  }
+
+  .brand p {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .header-actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .header-actions > button,
+  .header-actions .user-chip {
+    flex: 1 1 auto;
+  }
+
+  .user-chip {
+    min-width: 0;
+    width: 100%;
+    border-radius: 22px;
+  }
+
+  .hero-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+
+  .hero-copy,
+  .hero-points,
+  .hero-point,
+  .form-box,
+  .post,
+  .empty-state {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-copy h2 {
+    font-size: 2rem;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-copy p,
+  .hero-point,
+  .empty-state {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  #posts {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .side-actions {
+    right: 12px;
+    bottom: 14px;
+    gap: 8px;
+  }
+
+  .side-action {
+    min-width: 54px;
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hero-card {
+    padding: 20px;
+  }
+
+  .hero-copy h2 {
+    font-size: 1.78rem;
+  }
+
+  .post-actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

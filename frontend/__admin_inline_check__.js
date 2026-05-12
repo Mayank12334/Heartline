@@ -1,5 +1,5 @@
 
-    const API = "http://localhost:3000";
+    const API = "http://localhost:5000";
     let token = localStorage.getItem("token");
     let currentUser = null;
     let authDismissed = sessionStorage.getItem("authDismissed") === "true" || !token;
@@ -120,7 +120,7 @@
 
     async function loadCreators() {
       try {
-        const res = await fetch(`${API}/users`, {
+        const res = await fetch(`${API}/api/users`, {
           headers: getAuthHeaders()
         });
         const users = await res.json();
@@ -166,7 +166,7 @@
       }
 
       try {
-        const res = await fetch(`${API}/me`, {
+        const res = await fetch(`${API}/api/me`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
@@ -307,10 +307,11 @@
       }
 
       try {
-        const res = await fetch(`${API}/posts`, {
+        const res = await fetch(`${API}/api/posts`, {
           headers: getAuthHeaders()
         });
-        const data = await res.json();
+         const result = await res.json();   // get full response
+       const data = result.posts;   
 
         if (!Array.isArray(data) || data.length === 0) {
           document.getElementById("posts").innerHTML = '<div class="empty-state">No articles published yet. Create your first post to begin building your presence.</div>';
@@ -405,7 +406,7 @@
         return;
       }
 
-      const res = await fetch(`${API}/login`, {
+      const res = await fetch(`${API}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -449,7 +450,7 @@
         return;
       }
 
-      const res = await fetch(`${API}/register`, {
+      const res = await fetch(`${API}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, accountType })
@@ -482,7 +483,7 @@
         return;
       }
 
-      const res = await fetch(`${API}/create-post`, {
+      const res = await fetch(`${API}/api/create-post`, {
         method: "POST",
         headers: getAuthHeaders(true),
         body: JSON.stringify({ title, content })
@@ -504,7 +505,7 @@
     async function confirmDelete() {
       if (!pendingDeleteId) return;
 
-      const res = await fetch(`${API}/delete-post/${pendingDeleteId}`, {
+      const res = await fetch(`${API}/api/delete-post/${pendingDeleteId}`, {
         method: "DELETE",
         headers: getAuthHeaders()
       });
@@ -529,11 +530,11 @@
 
       if (!newTitle || !newContent) return;
 
-      const res = await fetch(`${API}/update-post/${pendingEditId}`, {
-        method: "PUT",
-        headers: getAuthHeaders(true),
-        body: JSON.stringify({ title: newTitle, content: newContent })
-      });
+      const res = await fetch(`${API}/api/update-post/${pendingEditId}`, {
+  method: "PUT",
+  headers: getAuthHeaders(true),
+  body: JSON.stringify({ title: newTitle, content: newContent })
+});
 
       const data = await res.json();
       closeEditModal();
@@ -544,7 +545,7 @@
 
     async function toggleFollowAuthor(userId, isFollowing) {
       const endpoint = isFollowing ? "unfollow" : "follow";
-      const res = await fetch(`${API}/${endpoint}/${userId}`, {
+      const res = await fetch(`${API}/api/${endpoint}/${userId}`, {
         method: "POST",
         headers: getAuthHeaders()
       });

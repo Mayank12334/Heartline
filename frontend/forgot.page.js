@@ -1,4 +1,4 @@
-﻿const API = "http://localhost:3000";
+﻿const API = "http://localhost:5000";
     const msg = document.getElementById("msg");
     const forgotValidation = document.getElementById("forgotValidation");
 
@@ -31,7 +31,7 @@
       }
 
       try {
-        const res = await fetch(`${API}/forgot-password`, {
+        const res = await fetch(`${API}/api/forgot-password`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email })

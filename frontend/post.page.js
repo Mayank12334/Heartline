@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+const API = "http://localhost:5000";
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("id");
 const storyTitle = document.getElementById("storyTitle");
@@ -147,7 +147,7 @@ function renderReply(reply, comment) {
       <p>${escapeHtml(reply.content)}</p>
       <div class="comment-actions">
         <button class="comment-action-btn" type="button" onclick="toggleReplyLike('${comment._id}', '${reply._id}')">
-          ${getReplyActionLabel(reply)} · ${getCount(reply.likesCount)}
+          ${getReplyActionLabel(reply)} ï¿½ ${getCount(reply.likesCount)}
         </button>
       </div>
     </div>
@@ -173,9 +173,9 @@ function renderComment(comment) {
       <p>${escapeHtml(comment.content)}</p>
       <div class="comment-actions">
         <button class="comment-action-btn" type="button" onclick="toggleCommentLike('${comment._id}')">
-          ${getCommentActionLabel(comment)} · ${getCount(comment.likesCount)}
+          ${getCommentActionLabel(comment)} ï¿½ ${getCount(comment.likesCount)}
         </button>
-        ${comment.viewerContext?.canReply ? `<button class="comment-action-btn" type="button" onclick="toggleReplyComposer('${comment._id}')">Reply${replies.length ? ` · ${replies.length}` : ""}</button>` : ""}
+        ${comment.viewerContext?.canReply ? `<button class="comment-action-btn" type="button" onclick="toggleReplyComposer('${comment._id}')">Reply${replies.length ? ` ï¿½ ${replies.length}` : ""}</button>` : ""}
       </div>
       ${comment.viewerContext?.canReply ? `
         <div class="reply-form" id="reply-form-${comment._id}" hidden>
@@ -225,7 +225,7 @@ function renderPost(post) {
   const bookmarksCount = getCount(post.bookmarksCount);
   const commentsCount = getCount(post.commentsCount);
   storyTitle.textContent = post.title || "Untitled Article";
-  storyMeta.textContent = `By ${post.userId?.name || "Unknown author"} • ${post.userId?.email || "No email available"} • Updated ${formatDate(post.updatedAt || post.createdAt)}`;
+  storyMeta.textContent = `By ${post.userId?.name || "Unknown author"} ï¿½ ${post.userId?.email || "No email available"} ï¿½ Updated ${formatDate(post.updatedAt || post.createdAt)}`;
   storyContent.textContent = post.content || "No story content available.";
   storyChips.innerHTML = `
     <span class="chip">${escapeHtml(post.status || "published")}</span>
@@ -269,7 +269,7 @@ async function refreshNotifications() {
   notificationsInFlight = true;
 
   try {
-    const res = await fetch(`${API}/me`, {
+    const res = await fetch(`${API}/api/me`, {
       headers: getHeaders()
     });
     const data = await res.json();
@@ -282,7 +282,7 @@ async function refreshNotifications() {
     });
 
     if (unread.length) {
-      await fetch(`${API}/notifications/mark-read`, {
+      await fetch(`${API}/api/notifications/mark-read`, {
         method: "POST",
         headers: getHeaders()
       });
@@ -320,7 +320,7 @@ async function loadPost() {
   }
 
   try {
-    const res = await fetch(`${API}/posts/${postId}`, {
+    const res = await fetch(`${API}/api/posts/${postId}`, {
       headers: getHeaders()
     });
     const data = await res.json();
@@ -355,7 +355,7 @@ async function toggleLike() {
     return;
   }
   try {
-    const res = await fetch(`${API}/posts/${postId}/toggle-like`, {
+    const res = await fetch(`${API}/api/posts/${postId}/toggle-like`, {
       method: "POST",
       headers: getHeaders()
     });
@@ -372,7 +372,7 @@ async function toggleBookmark() {
     return;
   }
   try {
-    const res = await fetch(`${API}/posts/${postId}/toggle-bookmark`, {
+    const res = await fetch(`${API}/api/posts/${postId}/toggle-bookmark`, {
       method: "POST",
       headers: getHeaders()
     });
@@ -396,7 +396,7 @@ async function addComment() {
   }
 
   try {
-    const res = await fetch(`${API}/posts/${postId}/comments`, {
+    const res = await fetch(`${API}/api/posts/${postId}/comments`, {
       method: "POST",
       headers: getHeaders(true),
       body: JSON.stringify({ content })
@@ -419,7 +419,7 @@ async function toggleCommentLike(commentId) {
   }
 
   try {
-    const res = await fetch(`${API}/posts/${postId}/comments/${commentId}/toggle-like`, {
+    const res = await fetch(`${API}/api/posts/${postId}/comments/${commentId}/toggle-like`, {
       method: "POST",
       headers: getHeaders()
     });
@@ -459,7 +459,7 @@ async function submitReply(commentId) {
   }
 
   try {
-    const res = await fetch(`${API}/posts/${postId}/comments/${commentId}/replies`, {
+    const res = await fetch(`${API}/api/posts/${postId}/comments/${commentId}/replies`, {
       method: "POST",
       headers: getHeaders(true),
       body: JSON.stringify({ content })
@@ -482,7 +482,7 @@ async function toggleReplyLike(commentId, replyId) {
   }
 
   try {
-    const res = await fetch(`${API}/posts/${postId}/comments/${commentId}/replies/${replyId}/toggle-like`, {
+    const res = await fetch(`${API}/api/posts/${postId}/comments/${commentId}/replies/${replyId}/toggle-like`, {
       method: "POST",
       headers: getHeaders()
     });
@@ -495,7 +495,7 @@ async function toggleReplyLike(commentId, replyId) {
 
 async function deleteComment(commentId) {
   try {
-    const res = await fetch(`${API}/posts/${postId}/comments/${commentId}`, {
+    const res = await fetch(`${API}/api/posts/${postId}/comments/${commentId}`, {
       method: "DELETE",
       headers: getHeaders()
     });
@@ -508,7 +508,7 @@ async function deleteComment(commentId) {
 
 async function deleteReply(commentId, replyId) {
   try {
-    const res = await fetch(`${API}/posts/${postId}/comments/${commentId}/replies/${replyId}`, {
+    const res = await fetch(`${API}/api/posts/${postId}/comments/${commentId}/replies/${replyId}`, {
       method: "DELETE",
       headers: getHeaders()
     });
@@ -521,7 +521,7 @@ async function deleteReply(commentId, replyId) {
 
 async function deletePost() {
   try {
-    const res = await fetch(`${API}/delete-post/${postId}`, {
+    const res = await fetch(`${API}/api/delete-post/${postId}`, {
       method: "DELETE",
       headers: getHeaders()
     });

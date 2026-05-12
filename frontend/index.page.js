@@ -1,5 +1,5 @@
-const API = "http://localhost:3000";
-    const ADMIN_EMAIL = "mayanksharma7012@gmail.com";
+const API = "http://localhost:5000";
+    const ADMIN_EMAIL = "admin@gmail.com";
     const currentPage = window.location.pathname.split("/").pop().toLowerCase() || "index.html";
     let token = sessionStorage.getItem("token");
     let currentUser = null;
@@ -502,7 +502,7 @@ const API = "http://localhost:3000";
       });
 
       if (unread.length > 0) {
-        await fetch(`${API}/notifications/mark-read`, {
+        await fetch(`${API}/api/notifications/mark-read`, {
           method: "POST",
           headers: getAuthHeaders()
         });
@@ -754,7 +754,7 @@ const API = "http://localhost:3000";
       }
 
       try {
-        const res = await fetch(`${API}/conversations`, {
+        const res = await fetch(`${API}/api/conversations`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
@@ -776,7 +776,7 @@ const API = "http://localhost:3000";
       chatThread.innerHTML = "Loading conversation...";
 
       try {
-        const res = await fetch(`${API}/conversations/${userId}`, {
+        const res = await fetch(`${API}/api/conversations/${userId}`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
@@ -820,7 +820,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/conversations/${activeConversationUserId}/messages`, {
+      const res = await fetch(`${API}/api/conversations/${activeConversationUserId}/messages`, {
         method: "POST",
         headers: getAuthHeaders(true),
         body: JSON.stringify({ text })
@@ -862,7 +862,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/conversations/${userIdToDelete}`, {
+      const res = await fetch(`${API}/api/conversations/${userIdToDelete}`, {
         method: "DELETE",
         headers: getAuthHeaders()
       });
@@ -888,7 +888,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/membership/subscribe`, {
+      const res = await fetch(`${API}/api/membership/subscribe`, {
         method: "POST",
         headers: getAuthHeaders(true),
         body: JSON.stringify({ tier })
@@ -909,28 +909,32 @@ const API = "http://localhost:3000";
     }
 
     async function loadAdminAnnouncement() {
-      try {
-        const res = await fetch(`${API}/admin-announcement`);
-        const data = await res.json();
-        const announcement = data.announcement;
+  try {
+    const res = await fetch(`${API}/api/admin-announcement`);
+    const data = await res.json();
+    const announcement = data.announcement;
 
-        if (!announcement) {
-          adminAnnouncement.classList.remove("active");
-          return;
-        }
-
-        adminAnnouncementTitle.textContent = announcement.title || "Message from admin";
-        adminAnnouncementBody.textContent = announcement.content || "The admin has shared an update.";
-        adminAnnouncementMeta.textContent = `From ${announcement.author?.name || "Admin"} � ${formatAnnouncementDate(announcement.createdAt)}`;
-        adminAnnouncement.classList.add("active");
-      } catch (error) {
-        adminAnnouncement.classList.remove("active");
-      }
+    if (!announcement) {
+      adminAnnouncement.classList.remove("active");
+      return;
     }
+
+    adminAnnouncementTitle.textContent = announcement.title || "";
+    adminAnnouncementBody.textContent = announcement.content || "";
+    adminAnnouncementMeta.textContent =
+      `From ${announcement.author?.name || "Admin"}`;
+
+    adminAnnouncement.classList.add("active");
+
+  } catch (error) {
+    console.error("Error loading announcement:", error);
+    adminAnnouncement.classList.remove("active");
+  }
+}
 
     async function loadCreators() {
       try {
-        const res = await fetch(`${API}/users`, {
+        const res = await fetch(`${API}/api/users`, {
           headers: getAuthHeaders()
         });
         const users = await res.json();
@@ -1001,7 +1005,7 @@ const API = "http://localhost:3000";
       }
 
       try {
-        const res = await fetch(`${API}/me`, {
+        const res = await fetch(`${API}/api/me`, {
           headers: getAuthHeaders()
         });
         const data = await res.json();
@@ -1486,32 +1490,40 @@ const API = "http://localhost:3000";
 
       const requestId = ++loadPostsRequestId;
 
-      try {
-        const res = await fetch(`${API}/posts?workspace=true&sort=${encodeURIComponent(feedSortSelect?.value || "recent")}`, {
-          headers: getAuthHeaders()
-        });
-        const data = await res.json();
+     try {
+  const res = await fetch(
+    `${API}/api/posts?sort=${encodeURIComponent(feedSortSelect?.value || "recent")}`,
+    {
+      headers: getAuthHeaders()
+    }
+  );
 
-        if (requestId !== loadPostsRequestId) {
-          return;
-        }
+  const data = await res.json();
 
-        allWorkspacePosts = Array.isArray(data)
-          ? data.filter(post => !(post.kind === "announcement" || (post.title === "Message from admin" && isAdminAccount(post.userId))))
-          : [];
-        renderFeedFromState();
-      } catch (err) {
-        if (requestId !== loadPostsRequestId) {
-          return;
-        }
-        if (feedResultsSummary) {
-          feedResultsSummary.textContent = "We could not load the story workspace right now.";
-        }
-        if (postsContainer) {
+  if (requestId !== loadPostsRequestId) {
+    return;
+  }
+
+  const receivedPosts = Array.isArray(data) ? data : data.posts;
+  allWorkspacePosts = Array.isArray(receivedPosts)
+    ? receivedPosts.filter(post => post.kind !== "announcement" || currentUser?.isAdmin)
+    : [];
+
+  renderFeedFromState();
+
+} catch (err) {
+  if (requestId !== loadPostsRequestId) return;
+
+  if (feedResultsSummary) {
+    feedResultsSummary.textContent =
+      "We could not load the story workspace right now.";
+  }
+  if (postsContainer) {
           postsContainer.innerHTML = '<div class="empty-state">We could not load your articles right now. Please try again in a moment.</div>';
         }
       }
     }
+    
 
     function openPostPage(postId) {
       const selectedPost = allWorkspacePosts.find(post => String(post._id) === String(postId));
@@ -1535,7 +1547,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/posts/${postId}/toggle-like`, {
+      const res = await fetch(`${API}/api/posts/${postId}/toggle-like`, {
         method: "POST",
         headers: getAuthHeaders()
       });
@@ -1555,7 +1567,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/posts/${postId}/toggle-bookmark`, {
+      const res = await fetch(`${API}/api/posts/${postId}/toggle-bookmark`, {
         method: "POST",
         headers: getAuthHeaders()
       });
@@ -1575,7 +1587,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/posts/${postId}/boost`, {
+      const res = await fetch(`${API}/api/posts/${postId}/boost`, {
         method: "POST",
         headers: getAuthHeaders()
       });
@@ -1623,7 +1635,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/login`, {
+      const res = await fetch(`${API}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -1666,7 +1678,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/register`, {
+      const res = await fetch(`${API}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, accountType, avatarId })
@@ -1738,7 +1750,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/create-post`, {
+      const res = await fetch(`${API}/api/create-post`, {
         method: "POST",
         headers: getAuthHeaders(true),
         body: JSON.stringify({ title: "Message from admin", content, status: "published", kind: "announcement" })
@@ -1760,7 +1772,7 @@ const API = "http://localhost:3000";
     async function confirmDelete() {
       if (!pendingDeleteId) return;
 
-      const res = await fetch(`${API}/delete-post/${pendingDeleteId}`, {
+      const res = await fetch(`${API}/api/delete-post/${pendingDeleteId}`, {
         method: "DELETE",
         headers: getAuthHeaders()
       });
@@ -1785,7 +1797,7 @@ const API = "http://localhost:3000";
 
       if (!newTitle || !newContent) return;
 
-      const res = await fetch(`${API}/update-post/${pendingEditId}`, {
+      const res = await fetch(`${API}/api/update-post/${pendingEditId}`, {
         method: "PUT",
         headers: getAuthHeaders(true),
         body: JSON.stringify({ title: newTitle, content: newContent })
@@ -1800,7 +1812,7 @@ const API = "http://localhost:3000";
 
     async function toggleFollowAuthor(userId, isFollowing) {
       const endpoint = isFollowing ? "unfollow" : "follow";
-      const res = await fetch(`${API}/${endpoint}/${userId}`, {
+      const res = await fetch(`${API}/api/${endpoint}/${userId}`, {
         method: "POST",
         headers: getAuthHeaders()
       });
@@ -1818,7 +1830,7 @@ const API = "http://localhost:3000";
     }
 
     async function approveFollowRequest(requesterId) {
-      const res = await fetch(`${API}/follow-request/${requesterId}/approve`, {
+      const res = await fetch(`${API}/api/follow-request/${requesterId}/approve`, {
         method: "POST",
         headers: getAuthHeaders()
       });
@@ -1833,7 +1845,7 @@ const API = "http://localhost:3000";
     }
 
     async function rejectFollowRequest(requesterId) {
-      const res = await fetch(`${API}/follow-request/${requesterId}/reject`, {
+      const res = await fetch(`${API}/api/follow-request/${requesterId}/reject`, {
         method: "POST",
         headers: getAuthHeaders()
       });
@@ -1850,7 +1862,7 @@ const API = "http://localhost:3000";
     async function removeSelectedUser() {
       if (!selectedIdentityUserId || !currentUser?.isAdmin) return;
 
-      const res = await fetch(`${API}/admin/remove-user/${selectedIdentityUserId}`, {
+      const res = await fetch(`${API}/api/admin/remove-user/${selectedIdentityUserId}`, {
         method: "DELETE",
         headers: getAuthHeaders()
       });
@@ -1866,7 +1878,7 @@ const API = "http://localhost:3000";
     async function adminRemoveUser(userId) {
       if (!currentUser?.isAdmin || !userId) return;
 
-      const res = await fetch(`${API}/admin/remove-user/${userId}`, {
+      const res = await fetch(`${API}/api/admin/remove-user/${userId}`, {
         method: "DELETE",
         headers: getAuthHeaders()
       });
@@ -1973,25 +1985,19 @@ const API = "http://localhost:3000";
       window.location.replace("index.html");
     }
 
-    async function initializeApp() {
-      renderSignupAvatarPicker();
-      switchAuth("login");
-      updateAuthUI();
-      await fetchCurrentUser();
-      updateAuthUI();
-      showUnreadNotifications();
-      showFollowRequestsIfNeeded();
-      loadAdminAnnouncement();
-      loadCreators();
-      loadPosts();
-      startActivityRefresh();
-      loadConversations();
-    }
+async function initializeApp() {
+  renderSignupAvatarPicker();
+  switchAuth("login");
+  updateAuthUI();
+  await fetchCurrentUser();
+  updateAuthUI();
+  showUnreadNotifications();
+  showFollowRequestsIfNeeded();
+  loadAdminAnnouncement();
+  loadCreators();
+  loadPosts();   // ✅ ONLY ONE CALL HERE
+  startActivityRefresh();
+  loadConversations();
+}
 
-    initializeApp();
-
-
-
-
-
-
+document.addEventListener("DOMContentLoaded", initializeApp);

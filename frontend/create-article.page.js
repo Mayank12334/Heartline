@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+﻿const API = "http://localhost:5000";
     const token = sessionStorage.getItem("token");
     const params = new URLSearchParams(window.location.search);
     let currentPostId = params.get("id");
@@ -66,7 +66,7 @@ const API = "http://localhost:3000";
         return;
       }
 
-      const res = await fetch(`${API}/posts/${currentPostId}`, {
+      const res = await fetch(`${API}/api/posts/${currentPostId}`, {
         headers: {
           "Authorization": "Bearer " + token
         }

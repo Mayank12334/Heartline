@@ -1,5 +1,5 @@
-const API = "http://localhost:3000";
-    const ADMIN_EMAIL = "mayanksharma7012@gmail.com";
+const API = "http://localhost:5000";
+    const ADMIN_EMAIL = "admin@gmail.com";
     const msg = document.getElementById("msg");
     const loginValidation = document.getElementById("loginValidation");
 
@@ -48,7 +48,7 @@ const API = "http://localhost:3000";
       }
 
       try {
-        const res = await fetch(`${API}/login`, {
+        const res = await fetch(`${API}/api/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })
@@ -60,6 +60,11 @@ const API = "http://localhost:3000";
           const nextUser = data.user || { email };
           sessionStorage.setItem("token", data.token);
           sessionStorage.setItem("dashboardPath", getDashboardPathForUser(nextUser));
+          if (getDashboardPathForUser(nextUser) === "admin.html") {
+            localStorage.setItem("adminToken", data.token);
+          } else {
+            localStorage.removeItem("adminToken");
+          }
           setMessage("Signed in successfully.", true);
           window.location.replace(getDashboardPathForUser(nextUser));
           return;

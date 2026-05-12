@@ -1,5 +1,5 @@
 
-    const API = "http://localhost:3000";
+    const API = "http://localhost:5000";
     const msg = document.getElementById("msg");
     const signupButton = document.getElementById("signupButton");
     const passwordField = document.getElementById("password");
@@ -123,7 +123,7 @@
         return;
       }
 
-      const res = await fetch(`${API}/register`, {
+      const res = await fetch(`${API}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, avatarId })

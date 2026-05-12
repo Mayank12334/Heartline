@@ -7,9 +7,11 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
 const User = require("./models/User");
+const Announcement = require("./models/Announcement");
 const Post = require("./models/Post");
 const Conversation = require("./models/Conversation");
-const ADMIN_EMAIL = "mayanksharma7012@gmail.com";
+const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_PASSWORD = "mayank";
 const MEMBERSHIP_PLANS = {
   free: { tier: "free", label: "Free", price: 0, boostCredits: 0, durationDays: 0 },
   starter: { tier: "starter", label: "Starter", price: 9, boostCredits: 3, durationDays: 30 },
@@ -21,6 +23,13 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+
+app.use((req, res, next) => {
+  if (req.url === "/api" || req.url.startsWith("/api/")) {
+    req.url = req.url.slice(4) || "/";
+  }
+  next();
+});
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -61,9 +70,74 @@ async function sendLoginAlertEmail(name, email) {
   });
 }
 
-mongoose.connect("mongodb://127.0.0.1:27017/blogDB")
-  .then(() => console.log("DB Connected"))
+mongoose.connect(process.env.MONGO_URI)
+  .then(async () => {
+    console.log("DB Connected");
+    const adminUser = await ensureAdminAccount();
+    await ensureStarterPost(adminUser);
+  })
   .catch(err => console.log(err));
+
+async function ensureAdminAccount() {
+  try {
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+    const adminUser = await User.findOne({ email: ADMIN_EMAIL });
+
+    if (adminUser) {
+      adminUser.name = adminUser.name || "Hearthline Admin";
+      adminUser.password = hashedPassword;
+      adminUser.accountType = "public";
+      adminUser.avatarId = adminUser.avatarId || "avatar-10";
+      adminUser.isVerified = true;
+      adminUser.isRemoved = false;
+      adminUser.removedAt = undefined;
+      adminUser.removedReason = undefined;
+      await adminUser.save();
+      return adminUser;
+    }
+
+    return User.create({
+      name: "Hearthline Admin",
+      email: ADMIN_EMAIL,
+      password: hashedPassword,
+      avatarId: "avatar-10",
+      accountType: "public",
+      isVerified: true
+    });
+  } catch (error) {
+    console.log("Unable to prepare admin account", error);
+    return null;
+  }
+}
+
+async function ensureStarterPost(adminUser) {
+  try {
+    if (!adminUser) return;
+
+    const visiblePost = await Post.findOne({
+      userId: { $exists: true },
+      kind: "post",
+      status: "published"
+    }).populate("userId", "_id isRemoved");
+
+    if (visiblePost?.userId && !visiblePost.userId.isRemoved) return;
+
+    await Post.create({
+      title: "Welcome to Hearthline",
+      content: "Your blog workspace is ready. Create your first story, follow other writers, and keep the conversation moving from one place.",
+      excerpt: "Your blog workspace is ready. Create your first story, follow other writers, and keep the conversation moving from one place.",
+      status: "published",
+      kind: "post",
+      userId: adminUser._id,
+      boost: {
+        isActive: false,
+        tierSnapshot: "free"
+      }
+    });
+  } catch (error) {
+    console.log("Unable to prepare starter post", error);
+  }
+}
 
 function sanitizePostPayload(payload = {}) {
   const title = String(payload.title || "").trim();
@@ -368,7 +442,7 @@ function populatePostRelations(query) {
 }
 
 async function requireAdmin(req, res, next) {
-  const actingUser = await User.findById(req.userId).select("email");
+  const actingUser = await User.findById(req.userId).select("name email");
 
   if (!isAdminUser(actingUser)) {
     return res.json({ message: "Admin access required." });
@@ -464,7 +538,11 @@ app.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    await sendLoginAlertEmail(user.name, user.email);
+    if (!isAdminUser(user)) {
+      sendLoginAlertEmail(user.name, user.email).catch(error => {
+        console.log("Unable to send login alert", error);
+      });
+    }
 
     res.json({
       message: "Login successful.",
@@ -486,6 +564,22 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json({ users });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+app.get("/api/admin-announcement", async (req, res) => {
+  try {
+    const announcement = await Announcement.findOne().sort({ createdAt: -1 });
+    res.json({ announcement });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch announcement" });
+  }
+});
 app.get("/me", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
@@ -577,6 +671,110 @@ app.get("/users", attachUserIfPresent, async (req, res) => {
 
     res.json(results);
   } catch (error) {
+    res.json({ message: "Something went wrong." });
+  }
+});
+app.get("/api/posts", async (req, res) => {
+  try {
+    const posts = await Post.find();
+    res.json({ posts });
+  } catch (err) {
+    console.error("🔥 POST ERROR:", err);
+    res.status(500).json({ error: "Failed to fetch posts" });
+  }
+});
+ 
+app.get("/admin/overview", verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const [users, posts, conversations] = await Promise.all([
+      User.find({ isRemoved: { $ne: true } })
+        .select("name email avatarId accountType followers following pendingFollowRequests notifications membership isVerified isRemoved removedAt removedReason resetToken resetTokenExpire")
+        .lean(),
+      Post.find()
+        .populate("userId", "name email avatarId accountType followers following pendingFollowRequests")
+        .sort({ updatedAt: -1, createdAt: -1 }),
+      Conversation.find().select("participants messages").lean()
+    ]);
+
+    const postsByUser = new Map();
+    posts.forEach(post => {
+      const userId = String(post.userId?._id || post.userId || "");
+      if (!userId) return;
+      const current = postsByUser.get(userId) || { total: 0, drafts: 0, announcements: 0, likes: 0, comments: 0 };
+      current.total += 1;
+      current.drafts += post.status === "draft" ? 1 : 0;
+      current.announcements += post.kind === "announcement" ? 1 : 0;
+      current.likes += Array.isArray(post.likes) ? post.likes.length : 0;
+      current.comments += Array.isArray(post.comments)
+        ? post.comments.reduce((total, comment) => total + 1 + (Array.isArray(comment.replies) ? comment.replies.length : 0), 0)
+        : 0;
+      postsByUser.set(userId, current);
+    });
+
+    const conversationCountByUser = new Map();
+    conversations.forEach(conversation => {
+      (conversation.participants || []).forEach(participantId => {
+        const key = String(participantId);
+        conversationCountByUser.set(key, (conversationCountByUser.get(key) || 0) + 1);
+      });
+    });
+
+    const formattedUsers = users.map(user => {
+      const userId = String(user._id);
+      const postStats = postsByUser.get(userId) || { total: 0, drafts: 0, announcements: 0, likes: 0, comments: 0 };
+      const membership = getMembershipSnapshot(user);
+
+      return {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatarId: user.avatarId,
+        isAdmin: isAdminUser(user),
+        accountType: user.accountType,
+        isVerified: Boolean(user.isVerified),
+        followersCount: Array.isArray(user.followers) ? user.followers.length : 0,
+        followingCount: Array.isArray(user.following) ? user.following.length : 0,
+        pendingFollowRequestsCount: Array.isArray(user.pendingFollowRequests) ? user.pendingFollowRequests.length : 0,
+        unreadNotificationsCount: Array.isArray(user.notifications)
+          ? user.notifications.filter(notification => !notification.read).length
+          : 0,
+        membership,
+        posts: postStats,
+        conversationsCount: conversationCountByUser.get(userId) || 0,
+        resetRequested: Boolean(user.resetToken && user.resetTokenExpire),
+        removedAt: user.removedAt || null,
+        removedReason: user.removedReason || ""
+      };
+    });
+
+    const activePosts = posts.filter(post => post.userId);
+    const privateUsers = formattedUsers.filter(user => user.accountType === "private").length;
+    const totalLikes = formattedUsers.reduce((total, user) => total + user.posts.likes, 0);
+    const totalComments = formattedUsers.reduce((total, user) => total + user.posts.comments, 0);
+
+    res.json({
+      admin: {
+        email: ADMIN_EMAIL,
+        name: req.actingUser.name || "Hearthline Admin"
+      },
+      stats: {
+        users: formattedUsers.length,
+        privateUsers,
+        posts: activePosts.filter(post => post.kind !== "announcement").length,
+        drafts: activePosts.filter(post => post.status === "draft").length,
+        announcements: activePosts.filter(post => post.kind === "announcement").length,
+        conversations: conversations.length,
+        likes: totalLikes,
+        comments: totalComments
+      },
+      users: formattedUsers,
+      posts: activePosts
+        .filter(post => post.kind !== "announcement")
+        .slice(0, 12)
+        .map(post => formatPost(ensurePostCollections(post), req.userId, true))
+    });
+  } catch (error) {
+    console.log(error);
     res.json({ message: "Something went wrong." });
   }
 });
@@ -1613,12 +1811,23 @@ app.delete("/admin/remove-user/:userId", verifyToken, requireAdmin, async (req, 
 
     await Promise.all([
       Post.deleteMany({ userId: targetUser._id }),
+      Post.updateMany(
+        {},
+        {
+          $pull: {
+            comments: { userId: targetUser._id },
+            "comments.$[].replies": { userId: targetUser._id }
+          }
+        }
+      ),
+      Conversation.deleteMany({ participants: targetUser._id }),
       User.updateMany(
         { _id: { $ne: targetUser._id } },
         {
           $pull: {
             followers: targetUser._id,
-            following: targetUser._id
+            following: targetUser._id,
+            pendingFollowRequests: { requester: targetUser._id }
           }
         }
       )
@@ -1640,6 +1849,6 @@ app.delete("/admin/remove-user/:userId", verifyToken, requireAdmin, async (req, 
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server started on port 3000");
+app.listen(5000, "0.0.0.0", () => {
+  console.log("Server started on port 5000");
 });

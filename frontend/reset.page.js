@@ -1,4 +1,4 @@
-﻿const API = "http://localhost:3000";
+﻿const API = "http://localhost:5000";
     const token = new URLSearchParams(window.location.search).get("token");
     const msg = document.getElementById("msg");
 
@@ -24,7 +24,7 @@
 
       const newPassword = document.getElementById("password").value;
 
-      const res = await fetch(`${API}/reset-password`, {
+      const res = await fetch(`${API}/api/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword })

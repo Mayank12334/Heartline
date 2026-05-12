@@ -3,428 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hearthline Blog</title>
+  <title>Hearthline Admin Panel</title>
   <link rel="icon" type="image/svg+xml" href="hearthline-favicon.svg">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#120f25">
+  <meta name="theme-color" content="#111827">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="theme.css">
-  <link rel="stylesheet" href="index.page.css">
+  <link rel="stylesheet" href="admin.page.css">
 </head>
-<body class="dashboard-page" id="top">
-  <div class="live-grid"></div>
-  <div class="live-orb one"></div>
-  <div class="live-orb two"></div>
-  <div class="live-orb three"></div>
-  <div class="live-image ring"></div>
-  <div class="live-image wave"></div>
-  <div class="live-image spark"></div>
-  <div class="app-shell" id="appShell">
-    <div class="container">
-      <div class="header">
-        <div class="brand">
-          <h1>Hearthline</h1>
-          <p>Publish thoughtful stories, capture fresh ideas, and manage your content from one refined workspace.</p>
+<body>
+  <main class="admin-shell">
+    <section class="admin-gate hidden" id="adminGate">
+      <div class="gate-panel">
+        <span class="gate-kicker">Hearthline Control</span>
+        <h1>Admin access</h1>
+        <p>Sign in with the platform admin account to open the private control panel.</p>
+        <form class="gate-form" onsubmit="adminLogin(event)">
+          <input id="adminEmail" type="email" value="admin@gmail.com" autocomplete="username" placeholder="Admin email">
+          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password">
+          <button id="adminLoginButton" type="submit">Enter Panel</button>
+        </form>
+        <div class="gate-message" id="gateMessage"></div>
+      </div>
+    </section>
+
+    <section class="admin-console hidden" id="adminConsole">
+      <header class="admin-header">
+        <div>
+          <span class="admin-kicker">Founder Dashboard</span>
+          <h1>Admin Command Center</h1>
+          <p id="adminIdentity">Signed in as admin@gmail.com with full platform access.</p>
         </div>
         <div class="header-actions">
-          <div class="admin-crown" id="adminCrown">Admin Mode</div>
-          <div class="user-chip" id="headerUserChip">
-            <img class="user-avatar" id="headerUserAvatar" alt="User avatar">
-            <div class="user-chip-copy">
-              <span class="user-chip-label">Signed In As</span>
-              <span class="user-chip-name" id="headerUserName">Hearthline user</span>
-              <span class="user-chip-type" id="headerUserType">Public account</span>
-            </div>
+          <button class="danger-btn" type="button" onclick="adminLogout()">Logout</button>
+        </div>
+      </header>
+
+      <section class="metric-grid" id="metricGrid"></section>
+
+      <section class="control-layout">
+        <div class="announcement-card">
+          <div class="section-head">
+            <span>Broadcast</span>
+            <h2>Send top notification</h2>
           </div>
-          <button class="ghost-btn" id="headerLoginButton" type="button" onclick="window.location.href='login.html'">Login</button>
-          <button class="primary" id="headerSignupButton" type="button" onclick="goToSignupPage()">Signup</button>
+          <textarea id="adminNoticeText" placeholder="Write a platform-wide notification..."></textarea>
+          <button class="primary-btn" type="button" onclick="sendAdminNotification()">Send Notification</button>
         </div>
-      </div>
 
-      <div class="hero-card">
-        <div class="hero-copy">
-          <h2>A creator network with posts, follows, chat, and blog boosting</h2>
-          <p>Create posts like a social feed, follow creators you care about, chat with friends, and unlock memberships that boost your blog across the platform.</p>
-        </div>
-        <div class="hero-points">
-          <div class="hero-point">Public accounts can be discovered by every visitor</div>
-          <div class="hero-point">Private accounts share posts only with followers</div>
-          <div class="hero-point">Follow writers, chat with them, and boost your best blog</div>
-        </div>
-      </div>
-
-      <div class="admin-announcement" id="adminAnnouncement">
-        <div class="admin-announcement-rail">
-          <div class="admin-announcement-card">
-            <span class="admin-announcement-signal"></span>
-            <span class="admin-announcement-label">Admin Notification</span>
-            <span class="admin-announcement-title" id="adminAnnouncementTitle">Message from admin</span>
-            <span class="admin-announcement-separator">&bull;</span>
-            <span class="admin-announcement-body" id="adminAnnouncementBody">The latest admin message will appear here for every user at the top of the page.</span>
-            <span class="admin-announcement-separator">&bull;</span>
-            <span class="admin-announcement-meta" id="adminAnnouncementMeta">From admin</span>
+        <div class="security-card">
+          <div class="section-head">
+            <span>Authority</span>
+            <h2>Full access enabled</h2>
+          </div>
+          <div class="authority-list">
+            <div>View public and private accounts</div>
+            <div>Inspect user emails, memberships, posts, and network counts</div>
+            <div>Delete any post and remove any non-admin user</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="creator-banner" id="creatorBanner">
-        <strong>Creator Access</strong>
-        <span id="creatorBannerText">You are signed in as the creator of Hearthline with complete authority over the platform experience.</span>
-      </div>
-
-      <div class="profile-card" id="profileCard">
-        <div>
-          <h3 id="profileTitle">Your writing profile</h3>
-          <p id="profileDescription">Choose how you want your writing to be seen and grow your audience with followers.</p>
-        </div>
-        <div class="profile-stats">
-          <div class="profile-stat">
-            <span>Account Type</span>
-            <strong id="profileAccountType">Public</strong>
-          </div>
-          <div class="profile-stat">
-            <span>Followers</span>
-            <strong id="profileFollowersCount">0</strong>
-          </div>
-          <div class="profile-stat">
-            <span>Following</span>
-            <strong id="profileFollowingCount">0</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-box" id="editorBox">
-        <div class="editor-cta">
-          <div class="editor-cta-copy">
-            <h3>Send Notification To All Users</h3>
-            <p>Write one admin message here and it will appear in the top notification banner for everyone, like "Hii this text from admin".</p>
-          </div>
-          <div class="announcement-form">
-            <textarea id="adminNoticeText" placeholder="Write your admin notification here..."></textarea>
-            <div class="announcement-form-actions">
-              <span class="announcement-form-note">Only the latest admin notification is shown at the top.</span>
-              <button class="primary" type="button" onclick="sendAdminNotification()">Send Notification</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="posts">Loading...</div>
-    </div>
-  </div>
-
-  <div class="auth-overlay" id="authOverlay">
-    <div class="auth-modal">
-      <div class="auth-modal-header">
-        <div class="auth-modal-title">
-          <h2>Welcome to Hearthline</h2>
-        </div>
-        <button class="modal-back" type="button" onclick="exitToHome()" aria-label="Back to home">&#8592;</button>
-      </div>
-      <p>Sign in to continue writing, or open the full account creation page to set up your profile with more space.</p>
-
-      <div class="auth-tabs">
-        <button class="tab-btn active" id="loginTab" type="button" onclick="switchAuth('login')">Sign In</button>
-        <button class="tab-btn" id="signupTab" type="button" onclick="goToSignupPage()">Create Account</button>
-      </div>
-
-      <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" novalidate>
-        <input id="loginEmail" type="text" placeholder="Email address" autocomplete="off">
-        <input id="loginPassword" type="password" placeholder="Password" autocomplete="new-password">
-        <div class="field-error" id="modalLoginValidation"></div>
-        <button class="primary" style="width: 100%; margin-right: 0;" type="submit">Sign In</button>
-        <div class="helper-links">
-          <a href="forgot.html">Forgot your password?</a>
-          <a class="signup-link" href="signup.html">Create an account</a>
-        </div>
-      </form>
-
-      <form class="auth-form" id="signupForm" onsubmit="handleSignup(event)" autocomplete="off" novalidate>
-        <input id="signupName" placeholder="Full name" autocomplete="off">
-        <input id="signupEmail" type="text" placeholder="Email address" autocomplete="off">
-        <div class="avatar-picker" id="signupAvatarPicker"></div>
-        <div class="visibility-group">
-          <label class="visibility-option" for="accountTypePublic">
-            <input id="accountTypePublic" type="radio" name="accountType" value="public" checked>
+      <section class="workspace-grid">
+        <div class="panel users-panel">
+          <div class="panel-head">
             <div>
-              <strong>Public account</strong>
-              <span>Your blogs can be seen by everyone visiting the platform.</span>
+              <span>People</span>
+              <h2>All user accounts</h2>
             </div>
-          </label>
-          <label class="visibility-option" for="accountTypePrivate">
-            <input id="accountTypePrivate" type="radio" name="accountType" value="private">
+            <input id="userSearch" type="search" placeholder="Search name or email">
+          </div>
+          <div class="users-list" id="usersList"></div>
+        </div>
+
+        <div class="panel posts-panel">
+          <div class="panel-head">
             <div>
-              <strong>Private account</strong>
-              <span>Your blogs are only visible to people who follow you.</span>
-            </div>
-          </label>
-        </div>
-        <div class="password-wrap">
-          <input id="signupPassword" type="password" placeholder="Create a password" autocomplete="new-password">
-          <button class="password-toggle" id="modalPasswordToggle" type="button" onclick="togglePasswordVisibility('signupPassword', 'modalPasswordToggle')">Show</button>
-        </div>
-        <div class="password-guide" id="modalPasswordGuide">
-          <div class="password-rule" data-rule="uppercase">Use at least one uppercase letter</div>
-          <div class="password-rule" data-rule="lowercase">Use at least one lowercase letter</div>
-          <div class="password-rule" data-rule="number">Use at least one numeric value</div>
-          <div class="password-rule" data-rule="special">Use at least one special character</div>
-        </div>
-        <div class="field-error" id="modalSignupValidation"></div>
-        <button class="primary" id="signupSubmitButton" style="width: 100%; margin-right: 0;" type="submit">Create Account</button>
-        <div class="helper-links">
-          <a class="login-link" href="#" onclick="switchAuth('login'); return false;">Already have an account?</a>
-        </div>
-      </form>
-
-      <p class="auth-message" id="authMessage"></p>
-    </div>
-  </div>
-
-  <div class="action-overlay" id="deleteOverlay">
-    <div class="action-modal">
-      <h3>Delete this post?</h3>
-      <p>This action will permanently remove the article from your dashboard.</p>
-      <div class="action-actions">
-        <button class="secondary-btn" type="button" onclick="closeDeleteModal()">Keep Post</button>
-        <button class="danger" id="confirmDeleteButton" type="button">Delete Post</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="action-overlay" id="editOverlay">
-    <div class="action-modal">
-      <h3>Edit your article</h3>
-      <p>Update the title or refine the content here without leaving the page.</p>
-      <div class="action-fields">
-        <input type="text" id="editTitleInput" placeholder="Article title">
-        <textarea id="editContentInput" placeholder="Update your story..."></textarea>
-      </div>
-      <div class="action-actions">
-        <button class="secondary-btn" type="button" onclick="closeEditModal()">Cancel</button>
-        <button class="primary" id="saveEditButton" type="button">Save Changes</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toastMessage">
-    <div class="toast-shell">
-      <div class="toast-icon" id="toastIcon">+</div>
-      <div>
-        <div class="toast-title" id="toastTitle">Notice</div>
-        <p class="toast-body" id="toastBody"></p>
-      </div>
-    </div>
-  </div>
-
-  <div class="identity-overlay" id="identityOverlay">
-    <div class="identity-modal">
-      <div class="identity-top">
-        <img class="identity-avatar" id="identityAvatar" alt="Identity avatar">
-        <div class="identity-headline">
-          <h3 id="identityName">Writer identity</h3>
-          <p id="identitySummary">A closer look at this writer's presence on Hearthline.</p>
-        </div>
-        <button class="identity-close" type="button" onclick="closeIdentityModal()">&times;</button>
-      </div>
-      <div class="author-actions">
-        <span class="privacy-badge public" id="identityType">Public account</span>
-        <span class="privacy-badge owner" id="identityRole">Writer</span>
-      </div>
-      <div class="identity-stats">
-        <div class="identity-stat">
-          <span>Followers</span>
-          <strong id="identityFollowers">0</strong>
-        </div>
-        <div class="identity-stat">
-          <span>Following</span>
-          <strong id="identityFollowing">0</strong>
-        </div>
-        <div class="identity-stat">
-          <span>Access</span>
-          <strong id="identityAccess">Open</strong>
-        </div>
-      </div>
-      <div class="identity-actions">
-        <button class="danger admin-remove-btn" id="removeUserButton" type="button">Remove User</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="action-overlay" id="chatDeleteOverlay">
-    <div class="action-modal chat-delete-modal">
-      <h3>Delete this chat?</h3>
-      <p id="chatDeleteMessage">This will permanently remove the current conversation.</p>
-      <div class="action-actions">
-        <button class="secondary-btn" type="button" onclick="closeDeleteChatModal()">Keep Chat</button>
-        <button class="danger" type="button" onclick="confirmDeleteChat()">Delete Chat</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="requests-overlay" id="requestsOverlay">
-    <div class="requests-modal">
-      <h3>New Follow Requests</h3>
-      <p>Approve followers to let them view your private posts.</p>
-      <div class="requests-list" id="requestsList"></div>
-      <div class="identity-actions">
-        <button class="secondary-btn" type="button" onclick="closeRequestsModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="side-actions">
-    <button class="search-trigger side-action" id="searchTriggerButton" type="button" onclick="openSearchModal()" data-label="Search" aria-label="Search">
-      <span class="search-trigger-icon">Q</span>
-      <span class="side-action-label">Search</span>
-    </button>
-    <button class="social-trigger side-action" id="socialTriggerButton" type="button" onclick="openSocialHub()" data-label="Social" aria-label="Social">
-      <span class="social-trigger-icon">S</span>
-      <span class="side-action-label">Social</span>
-    </button>
-    <button class="friends-trigger side-action" id="friendsTriggerButton" type="button" onclick="openFriendsModal()" data-label="Friends" aria-label="Friends">
-      <span class="friends-trigger-icon">F</span>
-      <span class="side-action-label">Friends</span>
-    </button>
-    <button class="writers-trigger side-action" id="writersTriggerButton" type="button" onclick="openWritersModal()" data-label="Writers" aria-label="Writers">
-      <span class="writers-trigger-icon">W</span>
-      <span class="side-action-label">Writers</span>
-    </button>
-    <button class="primary create-trigger side-action" id="headerCreateButton" type="button" onclick="goToCreateArticlePage()" data-label="New Article" aria-label="New Article">
-      <span class="create-trigger-icon">+</span>
-      <span class="side-action-label">New Article</span>
-    </button>
-    <button class="logout side-action" id="logoutButton" type="button" onclick="logout()" data-label="Logout" aria-label="Logout">
-      <span class="logout-trigger-icon">L</span>
-      <span class="side-action-label">Logout</span>
-    </button>
-  </div>
-
-  <div class="writers-overlay" id="writersOverlay">
-    <div class="writers-modal">
-      <div class="writers-modal-header">
-        <div class="writers-modal-copy">
-          <h3>Discover Writers</h3>
-          <p>Follow public or private writers from one dedicated space designed to feel cleaner and more focused.</p>
-        </div>
-        <button class="writers-close" type="button" onclick="closeWritersModal()" aria-label="Close writers panel">&times;</button>
-      </div>
-      <div class="writers-modal-body">
-        <div class="creators-box" id="creatorsBox">
-          <div class="creator-grid" id="creatorsList"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="social-overlay" id="socialOverlay">
-    <div class="social-modal">
-      <div class="writers-modal-header">
-        <div class="writers-modal-copy">
-          <h3>Social Hub</h3>
-          <p>Manage your membership, boost your blog reach, and chat with people you follow from one popup space.</p>
-        </div>
-        <button class="writers-close" type="button" onclick="closeSocialHub()" aria-label="Close social panel">&times;</button>
-      </div>
-      <div class="social-hub" id="socialHub">
-        <div class="social-card membership-card">
-          <div class="social-card-head">
-            <div>
-              <span class="social-kicker">Membership</span>
-              <h3>Boost your blog reach</h3>
-            </div>
-            <span class="membership-badge" id="membershipBadge">Free</span>
-          </div>
-          <p class="social-copy" id="membershipSummary">Upgrade your plan to get boost credits and push your best posts higher in the feed.</p>
-          <div class="membership-stats">
-            <div class="profile-stat">
-              <span>Tier</span>
-              <strong id="membershipTier">Free</strong>
-            </div>
-            <div class="profile-stat">
-              <span>Boost Credits</span>
-              <strong id="membershipCredits">0</strong>
+              <span>Content</span>
+              <h2>Latest articles</h2>
             </div>
           </div>
-          <div class="plan-grid">
-            <button class="plan-btn" type="button" onclick="subscribeMembership('starter')">Starter</button>
-            <button class="plan-btn" type="button" onclick="subscribeMembership('pro')">Pro</button>
-            <button class="plan-btn" type="button" onclick="subscribeMembership('business')">Business</button>
-          </div>
+          <div class="posts-list" id="postsList"></div>
         </div>
+      </section>
+    </section>
 
-        <div class="social-card chat-card">
-          <div class="social-card-head">
-            <div>
-              <span class="social-kicker">Friends Chat</span>
-              <h3>Message people you follow</h3>
-            </div>
-          </div>
-          <p class="social-copy">Find a friend quickly, open the thread, and send a message from one compact panel.</p>
-          <div class="chat-layout">
-            <div class="chat-sidebar">
-              <div class="chat-search-wrap">
-                <input id="chatSearchInput" type="text" placeholder="Search friends">
-              </div>
-              <div class="chat-friends" id="chatFriendsList"></div>
-            </div>
-            <div class="chat-panel">
-              <div class="chat-panel-head">
-                <strong id="chatPanelTitle">Conversation</strong>
-                <button class="danger subtle-danger chat-delete-btn" type="button" onclick="openDeleteChatModal()">Delete Chat</button>
-              </div>
-              <div class="chat-thread" id="chatThread">Select a creator to open your conversation.</div>
-              <form class="chat-composer" onsubmit="sendChatMessage(event)">
-                <input id="chatMessageInput" type="text" placeholder="Write a message to your friend...">
-                <button class="primary" type="submit">Send</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="friends-overlay" id="friendsOverlay">
-    <div class="friends-modal">
-      <div class="writers-modal-header">
-        <div class="writers-modal-copy">
-          <h3>Friends Circle</h3>
-          <p>Open your followers and following lists in one clean space built for every user, including admin.</p>
-        </div>
-        <button class="writers-close" type="button" onclick="closeFriendsModal()" aria-label="Close friends panel">&times;</button>
-      </div>
-      <div class="friends-tabs">
-        <button class="friends-tab active" id="followersTabButton" type="button" onclick="switchFriendsTab('followers')">Followers</button>
-        <button class="friends-tab" id="followingTabButton" type="button" onclick="switchFriendsTab('following')">Following</button>
-      </div>
-      <div class="friends-summary" id="friendsSummary">Loading your network...</div>
-      <div class="friends-grid" id="friendsList"></div>
-    </div>
-  </div>
-
-  <div class="search-overlay" id="searchOverlay">
-    <div class="search-modal">
-      <div class="writers-modal-header">
-        <div class="writers-modal-copy">
-          <h3>Search People</h3>
-          <p>Search any user from one popup and open their page just like the other side panels.</p>
-        </div>
-        <button class="writers-close" type="button" onclick="closeSearchModal()" aria-label="Close search panel">&times;</button>
-      </div>
-      <div class="search-panel">
-        <div class="search-panel-input">
-          <input id="userSearchInput" type="text" placeholder="Search user by name or email">
-        </div>
-        <div class="search-panel-summary" id="searchPanelSummary">Start typing to find users.</div>
-        <div class="search-results-grid" id="searchResultsList"></div>
-      </div>
-    </div>
-  </div>
+    <div class="toast" id="toastMessage"></div>
+  </main>
 
   <script src="pwa-register.js"></script>
-  <script src="index.page.js"></script>
+  <script src="admin.page.js"></script>
 </body>
 </html>
-
-
