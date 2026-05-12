@@ -1,5 +1,5 @@
 
-    const API = "http://localhost:5000";
+    const API = "http://18.191.175.125:5000";
     const msg = document.getElementById("msg");
     const signupButton = document.getElementById("signupButton");
     const passwordField = document.getElementById("password");
