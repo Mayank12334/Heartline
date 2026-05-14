@@ -1,4 +1,4 @@
-﻿const API = "http://18.191.175.125:5000";
+﻿const API = "http://3.148.247.91:5000";
     const token = sessionStorage.getItem("token");
     const params = new URLSearchParams(window.location.search);
     let currentPostId = params.get("id");
