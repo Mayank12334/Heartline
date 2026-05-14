@@ -1,4 +1,4 @@
-﻿const API = "http://13.58.3.140:5000";
+﻿const API = "http://3.138.42.18:5000";
     const token = new URLSearchParams(window.location.search).get("token");
     const msg = document.getElementById("msg");
 
