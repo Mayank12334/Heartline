@@ -9,7 +9,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/blogdb
+      - MONGO_URI=mongodb+srv://mayank28062005_db_user:mayank28062005_db_user@cluster0.y98eeey.mongodb.net/heartline
 
   frontend:
     build: ./frontend
