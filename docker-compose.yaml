@@ -9,7 +9,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=mongodb+srv://mayank28062005_db_user:mayank28062005_db_user@cluster0.y98eeey.mongodb.net/hearthline?retryWrites=true&w=majority
+      - MONGO_URI=mongodb+srv://Mayank123:Mayank123@cluster0.y98eeey.mongodb.net/hearthline?retryWrites=true&w=majority
 
   frontend:
     build: ./frontend
