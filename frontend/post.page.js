@@ -1,4 +1,4 @@
-const API = "http://3.148.247.91:5000";
+const API = "http://13.58.3.140:5000";
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("id");
 const storyTitle = document.getElementById("storyTitle");

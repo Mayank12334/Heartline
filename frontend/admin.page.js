@@ -1,4 +1,4 @@
-const API = "http://3.148.247.91:5000";
+const API = "http://13.58.3.140:5000";
 const ADMIN_EMAIL = "admin@gmail.com";
 
 let token = sessionStorage.getItem("token") || localStorage.getItem("adminToken");

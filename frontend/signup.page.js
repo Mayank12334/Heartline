@@ -1,4 +1,4 @@
-﻿const API = "http://3.148.247.91:5000";
+﻿const API = "http://13.58.3.140:5000";
     const msg = document.getElementById("msg");
     const passwordField = document.getElementById("password");
     const signupValidation = document.getElementById("signupValidation");

@@ -1,5 +1,5 @@
 
-    const API = "http://3.148.247.91:5000";
+    const API = "http://13.58.3.140:5000";
     const ADMIN_EMAIL = "mayanksharma7012@gmail.com";
     let token = localStorage.getItem("token");
     let currentUser = null;
